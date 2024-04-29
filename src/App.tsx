@@ -16,14 +16,12 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>H2ORIGIN APP</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Hic laborum provident assumenda, accusamus earum natus? Eos culpa eaque, consequuntur quaerat in inventore incidunt consequatur voluptatem? Corporis dolorum saepe voluptates? Consequuntur.</p>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
