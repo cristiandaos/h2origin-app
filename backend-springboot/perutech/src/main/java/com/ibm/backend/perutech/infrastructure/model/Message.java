@@ -21,9 +21,11 @@ public enum Message {
     SUCCESS_LOGIN("Authentication successful"),
     FAIL("could not register"),
     SUCCESS("registers correctly"),
-    // MENSAJES HTTP
-    STATUS_401("401 Unauthorized"),
-    STATUS_200("200");
+    SUCCESS_LIST("The list was successfully obtained"),
+    EMPTY_LIST("The list is empty"),
+    INVALID_TOKEN("Invalid token JWT!"),
+    HTTP_STATUS_401("401 Unauthorized"),
+    HTTP_STATUS_200("200");
 
     private final String message;
 }

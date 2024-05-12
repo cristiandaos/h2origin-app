@@ -1,5 +1,7 @@
 package com.ibm.backend.perutech.infrastructure.security;
 
+import com.ibm.backend.perutech.infrastructure.security.filter.JwtAuthenticationFilter;
+import com.ibm.backend.perutech.infrastructure.security.filter.JwtValidationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,9 +64,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers(HttpMethod.POST, "/api/v1/user/create").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/api/v1/user/").permitAll();
                     authorize.anyRequest().authenticated();
                 })
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtValidationFilter(authenticationManager()))
                 .build();
     }
 

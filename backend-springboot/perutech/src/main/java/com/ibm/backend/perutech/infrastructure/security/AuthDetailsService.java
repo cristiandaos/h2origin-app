@@ -1,6 +1,6 @@
 package com.ibm.backend.perutech.infrastructure.security;
 
-import com.ibm.backend.perutech.infrastructure.model.user.dto.UserRolDto;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -59,5 +59,13 @@ public class AuthDetailsService implements UserDetailsService {
                 true,
                 authorities
         );
+    }
+
+    @Data
+    protected static class UserRolDto{
+        private String Email;
+        private String Password;
+        private Boolean AccountStatus;
+        private String RoleName;
     }
 }

@@ -1,29 +1,56 @@
 package com.ibm.backend.perutech.infrastructure.controllers;
 
 import com.ibm.backend.perutech.application.usecases.CreateUserInteractor;
-import com.ibm.backend.perutech.domain.entity.User;
-import com.ibm.backend.perutech.infrastructure.mapper.user.UserDtoMapper;
+import com.ibm.backend.perutech.application.usecases.SelectUserInteractor;
+import com.ibm.backend.perutech.domain.entity.user.dto.DUserRoleDto;
 import com.ibm.backend.perutech.infrastructure.mapper.user.UserEntityMapper;
 import com.ibm.backend.perutech.infrastructure.model.Message;
 import com.ibm.backend.perutech.infrastructure.model.ServiceResponseModel;
 import com.ibm.backend.perutech.infrastructure.model.user.UserEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/user")
 public class UserController {
     private final CreateUserInteractor createUserUseCase;
+    private final SelectUserInteractor selectUserInteractor;
     private final UserEntityMapper userEntityMapper;
-    private final UserDtoMapper userDtoMapper;
 
     @Autowired
-    public UserController(CreateUserInteractor createUserUseCase, UserEntityMapper userEntityMapper, UserDtoMapper userDtoMapper) {
+    public UserController(CreateUserInteractor createUserUseCase, SelectUserInteractor selectUserInteractor, UserEntityMapper userEntityMapper) {
         this.createUserUseCase = createUserUseCase;
+        this.selectUserInteractor = selectUserInteractor;
         this.userEntityMapper = userEntityMapper;
-        this.userDtoMapper = userDtoMapper;
+    }
+
+    @GetMapping("/")
+    ResponseEntity<ServiceResponseModel> listUser() {
+        ServiceResponseModel serviceResponse = new ServiceResponseModel();
+        try {
+            List<DUserRoleDto> users = selectUserInteractor.SelectUser();
+            if (users != null) {
+                serviceResponse.setRecords(true);
+                serviceResponse.setMessage(Message.SUCCESS_LIST.getMessage());
+                serviceResponse.setDataListModel(userEntityMapper.toIUserRoleListDto(users));
+            } else {
+                serviceResponse.setRecords(false);
+                serviceResponse.setMessage(Message.EMPTY_LIST.getMessage());
+            }
+            serviceResponse.setSuccess(true);
+            return new ResponseEntity<>(serviceResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            serviceResponse.setSuccess(false);
+            serviceResponse.setMessage(Message.ERROR_SERVER.getMessage());
+            return new ResponseEntity<>(serviceResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -41,13 +68,13 @@ public class UserController {
      */
     @PostMapping("/create")
     ResponseEntity<ServiceResponseModel> create(@RequestBody UserEntity request) {
+        log.error("{}",request);
         ServiceResponseModel serviceResponse = new ServiceResponseModel();
         try {
-            User user = createUserUseCase.createUser(userEntityMapper.toDomainObj(request));
-            if (user != null) {
+            boolean user = createUserUseCase.createUser(userEntityMapper.toDomainObj(request));
+            if (user) {
                 serviceResponse.setRecords(true);
                 serviceResponse.setMessage(Message.SUCCESS.getMessage());
-                serviceResponse.setDataModel(userDtoMapper.toResponseObj(user));
             } else {
                 serviceResponse.setRecords(false);
                 serviceResponse.setMessage(Message.FAIL.getMessage());
@@ -55,6 +82,7 @@ public class UserController {
             serviceResponse.setSuccess(true);
             return new ResponseEntity<>(serviceResponse, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.error(e.getMessage());
             serviceResponse.setSuccess(false);
             serviceResponse.setMessage(Message.ERROR_SERVER.getMessage());
             return new ResponseEntity<>(serviceResponse, HttpStatus.INTERNAL_SERVER_ERROR);
